@@ -84,12 +84,14 @@ Usage
 To use this cookbook, just include `services` in your node's `run_list` or respective role environment `env_run_lists`:
 
 ```json
-{
-  "name":"my_node",
   "run_list": [
     "recipe[services]"
-  ]
-}
+  ],
+  "env_run_lists": {
+    "production": [
+      "recipe[services]"
+    ],
+  }
 ```
 
 Contributing
