@@ -86,14 +86,15 @@ Usage
 To use this cookbook, just include `packages` in your node's `run_list` or respective role environment `env_run_lists`:
 
 ```json
-{
-  "name":"my_node",
   "run_list": [
     "recipe[packages]"
-  ]
-}
+  ],
+  "env_run_lists": {
+    "production": [
+      "recipe[packages]"
+    ],
+  }
 ```
-
 Contributing
 ------------
 
