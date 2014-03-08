@@ -38,20 +38,20 @@
 #   }
 # }
 #
-# Note: node ['directories'][node.platform_family] directory options overrides node['directories']['common'] directory list options 
+# Note: node ['directories'][node.platform_family] directory _options overrides node['directories']['common'] directory list _options 
 #
 
 # Merge Common Directories List with Platform Directories List
-directories_list = node['directories']['common'].merge(node['directories'][node.platform_family])
+directories_list = node['directories']['common'].merge(node['directories'][node['platform_family']])
 
-directories_list.each {|_directory,options|
+directories_list.each {|_directory, _options|
   directory _directory do
-    owner           options['owner'] if options['owner']  
-    group           options['group'] if options['group']
-    mode            options['mode'] || node['directories']['default_attributes']['mode']
-    path            options['path'] if options['path']
-    provider        options['provider'] if options['provider']
-    recursive       options['recursive'] if options['recursive'] || node['directories']['default_attributes']['recursive']
-    action          options['action'] if options['action']
+    owner           _options['owner'] if _options['owner']  
+    group           _options['group'] if _options['group']
+    mode            _options['mode'] || node['directories']['default_attributes']['mode']
+    path            _options['path'] if _options['path']
+    provider        _options['provider'].inject(Object) {|x,y| x.const_get y} if _options['provider']
+    recursive       _options['recursive'] if _options['recursive'] || node['directories']['default_attributes']['recursive']
+    action          _options['action'] if _options['action']
   end
 }

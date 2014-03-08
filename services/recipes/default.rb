@@ -34,28 +34,28 @@
 # }
 #
 
-node['services'][node.platform_family].each {|_service,options|
+node['services'][node['platform_family']].each {|_service,_options|
 
   service _service do
-    init_command    options['init_command'] if options['init_command']
-    pattern         options['pattern'] if options['pattern']
-    provider        options['provider'] if options['provider']
-    reload_command  options['reload_command'] if options['reload_command']
-    restart_command options['restart_command'] if options['restart_command']
-    start_command   options['start_command'] if options['start_command']
-    status_command  options['status_command'] if options['status_command']
-    stop_command    options['stop_command'] if options['stop_command']
-    supports        options['supports'] || :status => true, :start => true, :stop => true, :restart => true
+    init_command    _options['init_command'] if _options['init_command']
+    pattern         _options['pattern'] if _options['pattern']
+    provider        _options['provider'].split('::').inject(Object) {|x,y| x.const_get y} if _options['provider']
+    reload_command  _options['reload_command'] if _options['reload_command']
+    restart_command _options['restart_command'] if _options['restart_command']
+    start_command   _options['start_command'] if _options['start_command']
+    status_command  _options['status_command'] if _options['status_command']
+    stop_command    _options['stop_command'] if _options['stop_command']
+    supports        _options['supports'] || :status => true, :start => true, :stop => true, :restart => true
 
-    if options['action']
-      action options['action']
+    if _options['action']
+      action _options['action']
     else
       # Default to Enable and Start the Service
       action [:start, :enable]
     end
 
     # Service Init.d or Startup Script
-    service_init_d = options['init_command'] || "/etc/init.d/#{_service}"
+    service_init_d = _options['init_command'] || "/etc/init.d/#{_service}"
 
     only_if { File.exists?(service_init_d) }
 

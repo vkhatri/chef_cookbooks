@@ -34,17 +34,15 @@
 # }
 #
 
-node['packages'][node.platform_family].each {|_package,package_options|
-  package_action = package_options['action'] || 'install'
-
+node['packages'][node['platform_family']].each {|_package, _options|
   package _package do
-    arch            package_options['arch'] if package_options['arch']
-    allow_downgrade package_options['allow_downgrade'] if package_options['allow_downgrade']
-    source          package_options['source'] if package_options['source']
-    version         package_options['version'] if package_options['version']
-    provider        package_options['provider'] if package_options['provider']
-    options         package_options['options'] if package_options['options']
-    flush_cache     package_options['flush_cache'] if package_options['flush_cache']
-    action          package_action.to_sym
+    arch            _options['arch'] if _options['arch']
+    allow_downgrade _options['allow_downgrade'] if _options['allow_downgrade']
+    source          _options['source'] if _options['source']
+    version         _options['version'] if _options['version']
+    provider        _options['provider'].split('::').inject(Object) {|x,y| x.const_get y} if _options['provider']
+    options         _options['options'] if _options['options']
+    flush_cache     _options['flush_cache'] if _options['flush_cache']
+    action          _options['action'] || 'install'
   end
 } 
