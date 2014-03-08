@@ -1,0 +1,85 @@
+#
+# Cookbook Name:: repository
+# Recipe:: default
+#
+# Copyright 2014, Virender Khatri
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+#default_options   =   node['repository']["default_options_#{node.platform_family}"] || {}
+
+node['repository']['repositories'].each {|role,platform_families|
+  platform_families.each {|platform_family,repo_files|
+    repo_files.each {|repo_name, repo_option|
+      # Disabling Default Options set for now
+      #
+      # repo_options    =   default_options.dup
+      # repo_options.merge!(repo_option)
+      #
+      repo_options      =   repo_option
+
+      # Merge Options with default one. It must update any undefined variable
+      # repo_options = repo_options.merge(default_options)
+      #
+      Chef::Log.warn("repo=#{repo_name}, setting up #{platform_family} repository")
+      case platform_family
+      when 'debian'
+        repo_action   =   repo_options['action'] || 'add'
+        apt_repository repo_name do
+          action repo_action.to_sym
+        end
+
+      when 'rhel'
+        repo_action   =   repo_options['action'] || 'create'
+        yum_repository repo_name do
+          description repo_options['description']
+          baseurl repo_options['baseurl']
+          mirrorlist repo_options[repo]['mirrorlist']
+          gpgcheck repo_options['gpgcheck']
+          gpgkey repo_options['gpgkey']
+          enabled repo_options['enabled']
+          #cost repo_options['cost']
+          #exclude repo_options['exclude']
+          #enablegroups repo_options['enablegroups']
+          failovermethod repo_options['failovermethod']
+          #http_caching repo_options['http_caching']
+          #include_config repo_options['include_config']
+          #includepkgs repo_options['includepkgs']
+          #keepalive repo_options['keepalive']
+          #max_retries repo_options['max_retries']
+          #metadata_expire repo_options['metadata_expire']
+          #mirror_expire repo_options['mirror_expire']
+          #priority repo_options['priority']
+          #proxy repo_options['proxy']
+          #proxy_username repo_options['proxy_username']
+          #proxy_password repo_options['proxy_password']
+          #repositoryid repo_options['repositoryid']
+          #sslcacert repo_options['sslcacert']
+          #sslclientcert repo_options['sslclientcert']
+          #sslclientkey repo_options['sslclientkey']
+          #sslverify repo_options['sslverify']
+          #timeout repo_options['timeout']
+          action repo_action.to_sym
+        end
+      end
+    }
+  }
+}
+
+if node.platform_family == 'debian-disabled'
+  template '/etc/apt/sources.list.d/my_apt_sources.list' do
+    notifies :run, 'execute[apt-get update]', :immediately
+  end
+end
+
