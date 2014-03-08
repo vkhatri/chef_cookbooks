@@ -1,4 +1,9 @@
 chef_cookbooks
 ==============
 
-Chef Cookbooks Repository
+This repository stores different custom written and some modified opscode site cookbooks.
+
+License
+==============
+
+Apache v2.0
